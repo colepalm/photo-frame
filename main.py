@@ -2,6 +2,7 @@ import os
 import random
 import tkinter as tk
 
+from datetime import datetime
 from PIL import Image, ImageTk
 
 
@@ -44,13 +45,14 @@ def update_image():
 
 def update_image_loop():
     update_image()
-    # Set the timer (e.g., 120 seconds)
     root.after(120000, update_image_loop)
 
 
 def update_time():
-    # Update and display the current time
-    pass
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    time_label.config(text=current_time)
+    root.after(1000, update_time)
 
 
 def update_weather():
@@ -71,11 +73,18 @@ root.attributes('-fullscreen', True)
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 
+canvas = tk.Canvas(root, width=200, height=100, bg='grey', highlightthickness=0)
+canvas.place(relx=1.0, rely=1.0, anchor='se')
+
 # Set up a label for the image
 image_label = tk.Label(root)
 image_label.pack()
 
+time_label = tk.Label(root, font=('Helvetica', 48), bg='black', fg='white')
+time_label.place(relx=1.0, rely=1.0, anchor='se')
+
 update_image_loop()
+update_time()
 
 # Start the loop for updating content
 root.mainloop()
