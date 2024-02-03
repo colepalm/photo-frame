@@ -16,15 +16,30 @@ def update_image():
 
     # Select a random image file
     selected_image = random.choice(files)
-
-    # Load the selected image using PIL
     image = Image.open(selected_image)
-    image = image.resize((800, 600), Image.LANCZOS)
+
+    # Calculate the optimal resize ratio to maintain aspect ratio
+    screen_ratio = screen_width / screen_height
+    image_ratio = image.width / image.height
+    if image_ratio > screen_ratio:
+        # Image is wider than the screen, scale by width
+        scale_factor = screen_width / image.width
+    else:
+        # Image is taller than the screen, scale by height
+        scale_factor = screen_height / image.height
+
+    new_width = int(image.width * scale_factor)
+    new_height = int(image.height * scale_factor)
+
+    image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
     photo = ImageTk.PhotoImage(image)
 
     # Display the image
     image_label.config(image=photo)
     image_label.image = photo
+
+    image_label.pack(padx=0, pady=0, expand=True)
 
 
 def update_image_loop():
@@ -51,6 +66,10 @@ def update_calendar():
 # Set up the main window using Tkinter
 root = tk.Tk()
 root.attributes('-fullscreen', True)
+
+# Get screen width and height
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
 
 # Set up a label for the image
 image_label = tk.Label(root)
