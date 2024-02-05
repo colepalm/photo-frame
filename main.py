@@ -1,8 +1,10 @@
 import os
 import random
 import tkinter as tk
+import requests
 
 from datetime import datetime
+
 from PIL import Image, ImageTk
 
 
@@ -56,8 +58,26 @@ def update_time():
 
 
 def update_weather():
-    # Fetch and display the current weather
-    pass
+    city = "Denver"
+    api_key = "87204bf6c88fe982ed5dc01c861e633c"
+    weather_data = fetch_weather(api_key, city)
+    if weather_data:
+        temperature = weather_data['main']['temp']
+        description = weather_data['weather'][0]['description']
+        weather_label.config(text=f"{temperature}°F, {description}")
+    # Update weather every 10 minutes
+    root.after(600000, update_weather)
+
+
+def fetch_weather(api_key, city):
+    base_url = "http://api.openweathermap.org/data/2.5/weather?"
+    complete_url = f"{base_url}appid={api_key}&q={city}&units=imperial"
+    response = requests.get(complete_url)
+    weather_data = response.json()
+    if weather_data['cod'] == 200:
+        return weather_data
+    else:
+        return None
 
 
 def update_calendar():
@@ -83,8 +103,12 @@ image_label.pack()
 time_label = tk.Label(root, font=('Helvetica', 48), bg='black', fg='white')
 time_label.place(relx=1.0, rely=1.0, anchor='se')
 
+weather_label = tk.Label(root, font=('Helvetica', 16), bg='black', fg='white')
+weather_label.place(relx=1.0, rely=0, anchor='ne')
+
 update_image_loop()
 update_time()
+update_weather()
 
 # Start the loop for updating content
 root.mainloop()
