@@ -85,7 +85,30 @@ def update_calendar():
     pass
 
 
-# Set up the main window using Tkinter
+def create_rounded_rectangle(canvas, x1, y1, x2, y2, radius=25, **kwargs):
+    points = [x1 + radius, y1,
+              x1 + radius, y1,
+              x2 - radius, y1,
+              x2 - radius, y1,
+              x2, y1,
+              x2, y1 + radius,
+              x2, y1 + radius,
+              x2, y2 - radius,
+              x2, y2 - radius,
+              x2, y2,
+              x2 - radius, y2,
+              x2 - radius, y2,
+              x1 + radius, y2,
+              x1 + radius, y2,
+              x1, y2,
+              x1, y2 - radius,
+              x1, y2 - radius,
+              x1, y1 + radius,
+              x1, y1 + radius,
+              x1, y1]
+    return canvas.create_polygon(points, **kwargs, smooth=True)
+
+
 root = tk.Tk()
 root.attributes('-fullscreen', True)
 
@@ -100,10 +123,20 @@ canvas.place(relx=1.0, rely=1.0, anchor='se')
 image_label = tk.Label(root)
 image_label.pack()
 
-time_label = tk.Label(root, font=('Helvetica', 48), bg='black', fg='white')
+bg_image = Image.open("bg.png")
+bg_photo = ImageTk.PhotoImage(bg_image)
+
+bg_label = tk.Label(root, image=bg_photo)
+bg_label.place(relx=1.0, rely=0, anchor='ne')
+
+canvas = tk.Canvas(root, width=400, height=100, bg='black', highlightthickness=0)
+canvas.pack()
+# create_rounded_rectangle(canvas, 10, 10, 390, 90, radius=20, fill='#44444480')
+
+time_label = tk.Label(root, text="00:00", font=('Arial', 48), bg='black', fg='white')
 time_label.place(relx=1.0, rely=1.0, anchor='se')
 
-weather_label = tk.Label(root, font=('Helvetica', 16), bg='black', fg='white')
+weather_label = tk.Label(root, text="25°C, Sunny", font=('Arial', 16), bg='black', fg='white')
 weather_label.place(relx=1.0, rely=0, anchor='ne')
 
 update_image_loop()
