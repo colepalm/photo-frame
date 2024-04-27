@@ -13,30 +13,23 @@ class PhotoFrameApp(QMainWindow):
         self.setWindowTitle("Digital Photo Frame")
         self.showFullScreen()
 
-        # Create a central widget and set a main vertical layout
+        self.last_size = None  # Track the last size to prevent unnecessary updates
+
+        # Central widget to hold the image
         central_widget = QWidget(self)
         self.setCentralWidget(central_widget)
-        main_layout = QVBoxLayout(central_widget)
-        main_layout.setContentsMargins(10, 10, 10, 10)
-        main_layout.setSpacing(0)
-
-        # Top right corner for weather information
-        top_layout = QHBoxLayout()
-        top_layout.addStretch(1)  # Pushes the weather label to the right
-        self.weather_label = QLabel("Loading weather...")
-        self.weather_label.setFont(QFont('Arial', 16))
-        self.weather_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 100);")
-        top_layout.addWidget(self.weather_label)
-        main_layout.addLayout(top_layout)
-
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_image)
+        central_widget.setStyleSheet("background-color: black;")
 
         # Image label
         self.image_label = QLabel()
         self.image_label.setScaledContents(True)
-        main_layout.addWidget(self.image_label, 1)
 
+        # Top right corner for weather information
+        self.weather_label = QLabel("Loading weather...")
+        self.weather_label.setFont(QFont('Arial', 16))
+        self.weather_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 100);")
+
+        self.timer = QTimer()
 
         # TODO: Requery weather periodically
         # self.weatherUpdateTimer = QTimer(self)
@@ -44,14 +37,9 @@ class PhotoFrameApp(QMainWindow):
         # self.weatherUpdateTimer.start(600000)  # 10 minutes in milliseconds
 
         # Horizontal layout for the bottom right time display
-        bottom_layout = QHBoxLayout()
-        bottom_layout.addStretch(1)  # Pushes the time label to the right
         self.time_label = QLabel("00:00", self)
         self.time_label.setFont(QFont('Arial', 18))
         self.time_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 100);")
-        bottom_layout.addWidget(self.time_label)
-
-        main_layout.addLayout(bottom_layout)
 
         self.photos_dir = './photos'
         self.photos_list = self.load_photos()
@@ -59,6 +47,24 @@ class PhotoFrameApp(QMainWindow):
 
         self.update_image()
         self.start_image_loop()
+        self.update_positions()  # Update positions based on the full screen size
+
+    def resizeEvent(self, event):
+        # Call to update positions if the size actually changes
+        if hasattr(self, 'last_size'):
+            if not self.last_size or event.size() != self.last_size:
+                self.update_positions()  # Update positions on resize event
+                self.last_size = event.size()
+        super().resizeEvent(event)
+
+    def update_positions(self):
+        """ Update positions of labels based on the current size of the window """
+        if hasattr(self, 'image_label') and hasattr(self, 'weather_label') and hasattr(self, 'time_label'):
+            screen_size = self.size()
+            self.image_label.setGeometry(0, 0, screen_size.width(), screen_size.height())
+            self.weather_label.move(screen_size.width() - self.weather_label.width() - 20, 20)
+            self.time_label.move(screen_size.width() - self.time_label.width() - 20,
+                                 screen_size.height() - self.time_label.height() - 20)
 
     def load_photos(self):
         """Load the paths of photos in the directory."""
@@ -87,13 +93,14 @@ class PhotoFrameApp(QMainWindow):
 
     def start_image_loop(self):
         """Change the photo at intervals."""
+        self.timer.timeout.connect(self.update_image)
         self.timer.start(120000)  # Change image every 120 seconds
 
     def update_time(self):
         # Update time label
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
-        self.timeLabel.setText(current_time)
+        self.time_label.setText(current_time)
 
     def update_weather(self):
         # Fetch and update weather
