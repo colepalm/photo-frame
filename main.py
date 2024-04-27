@@ -20,6 +20,15 @@ class PhotoFrameApp(QMainWindow):
         main_layout.setContentsMargins(10, 10, 10, 10)
         main_layout.setSpacing(0)
 
+        # Top right corner for weather information
+        top_layout = QHBoxLayout()
+        top_layout.addStretch(1)  # Pushes the weather label to the right
+        self.weather_label = QLabel("Loading weather...")
+        self.weather_label.setFont(QFont('Arial', 16))
+        self.weather_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 100);")
+        top_layout.addWidget(self.weather_label)
+        main_layout.addLayout(top_layout)
+
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_image)
 
@@ -27,6 +36,12 @@ class PhotoFrameApp(QMainWindow):
         self.image_label = QLabel()
         self.image_label.setScaledContents(True)
         main_layout.addWidget(self.image_label, 1)
+
+
+        # TODO: Requery weather periodically
+        # self.weatherUpdateTimer = QTimer(self)
+        # self.weatherUpdateTimer.timeout.connect(self.update_weather)
+        # self.weatherUpdateTimer.start(600000)  # 10 minutes in milliseconds
 
         # Horizontal layout for the bottom right time display
         bottom_layout = QHBoxLayout()
@@ -37,20 +52,6 @@ class PhotoFrameApp(QMainWindow):
         bottom_layout.addWidget(self.time_label)
 
         main_layout.addLayout(bottom_layout)
-
-        # Top right corner for weather information
-        top_layout = QHBoxLayout()
-        top_layout.addStretch(1)  # Pushes the weather label to the right
-        self.weather_label = QLabel("Loading weather...")
-        self.weather_label.setFont(QFont('Arial', 16))
-        self.weather_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 100);")
-        main_layout.addLayout(top_layout)
-        top_layout.addWidget(self.weather_label)
-
-        # TODO: Requery weather periodically
-        # self.weatherUpdateTimer = QTimer(self)
-        # self.weatherUpdateTimer.timeout.connect(self.update_weather)
-        # self.weatherUpdateTimer.start(600000)  # 10 minutes in milliseconds
 
         self.photos_dir = './photos'
         self.photos_list = self.load_photos()
