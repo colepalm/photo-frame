@@ -4,7 +4,7 @@ from datetime import datetime
 
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QWidget
 from PyQt5.QtGui import QPixmap, QFont
-from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtCore import QTimer, Qt, QDateTime
 
 
 class PhotoFrameApp(QMainWindow):
@@ -18,7 +18,7 @@ class PhotoFrameApp(QMainWindow):
         self.setCentralWidget(central_widget)
         central_widget.setStyleSheet("background-color: black;")
 
-        # Image label
+        # Image label setup
         self.image_label = QLabel(central_widget)
         self.image_label.setGeometry(0, 0, self.width(), self.height())
         self.image_label.setScaledContents(True)
@@ -27,7 +27,7 @@ class PhotoFrameApp(QMainWindow):
         self.weather_label = QLabel("Loading weather...", self.image_label)
         self.weather_label.setFont(QFont('Arial', 16))
         self.weather_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 100);")
-        self.weather_label.setGeometry(self.width() - 220, 20, 200, 40)  # Adjust size as needed
+        self.weather_label.setGeometry(self.width() - 220, 20, 200, 40)
 
         # TODO: Requery weather periodically
         # self.weatherUpdateTimer = QTimer(self)
@@ -38,7 +38,8 @@ class PhotoFrameApp(QMainWindow):
         self.time_label = QLabel("00:00", self.image_label)
         self.time_label.setFont(QFont('Arial', 24))
         self.time_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 100);")
-        self.time_label.setGeometry(self.width() - 220, self.height() - 70, 200, 50)  # Adjust size as needed
+        self.time_label.setAlignment(Qt.AlignCenter)
+        self.time_label.setGeometry(650, self.height() - 100, 200, 100)
 
         self.photos_dir = './photos'
         self.photos_list = self.load_photos()
@@ -48,7 +49,7 @@ class PhotoFrameApp(QMainWindow):
         self.start_image_loop()
 
         self.update_image()
-        self.update_time()  # Initial time update
+        self.update_time()  # Initial time and date update
         QTimer.singleShot(1000, self.update_time_loop)  # Update time every second
 
         self.update_positions()  # Update positions based on the full screen size
@@ -62,10 +63,10 @@ class PhotoFrameApp(QMainWindow):
     def update_positions(self):
         """ Update positions of labels based on the current size of the window """
         screen_size = self.size()
+        screen_size = self.size()
         self.image_label.setGeometry(0, 0, screen_size.width(), screen_size.height())
         self.weather_label.move(screen_size.width() - self.weather_label.width() - 20, 20)
-        self.time_label.move(screen_size.width() - self.time_label.width() - 20,
-                             screen_size.height() - self.time_label.height() - 20)
+        self.time_label.setGeometry(screen_size.width() - 300 - 20, screen_size.height() - 50 - 20, 300, 50)
 
     def load_photos(self):
         """Load the paths of photos in the directory."""
@@ -86,6 +87,7 @@ class PhotoFrameApp(QMainWindow):
         self.current_photo = (self.current_photo + 1) % len(self.photos_list)
 
     def start_image_loop(self):
+        """Change the photo at intervals."""
         self.timer.timeout.connect(self.update_image)
         self.timer.start(120000)  # Change image every 120 seconds
 
@@ -94,9 +96,11 @@ class PhotoFrameApp(QMainWindow):
         QTimer.singleShot(1000, self.update_time_loop)
 
     def update_time(self):
-        now = datetime.now()
-        current_time = now.strftime("%H:%M:%S")
-        self.time_label.setText(current_time)
+        """Update time and date."""
+        now = QDateTime.currentDateTime()
+        formatted_time = now.toString("hh:mm:ss")
+        formatted_date = now.toString("dddd, MMMM dd")
+        self.time_label.setText(f"{formatted_time}\n{formatted_date}")
 
 
 if __name__ == "__main__":
