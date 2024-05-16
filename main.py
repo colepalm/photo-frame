@@ -1,6 +1,6 @@
 import os
 import sys
-from datetime import datetime
+import requests
 
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QWidget
 from PyQt5.QtGui import QPixmap, QFont
@@ -29,10 +29,12 @@ class PhotoFrameApp(QMainWindow):
         self.weather_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 100);")
         self.weather_label.setGeometry(self.width() - 220, 20, 200, 40)
 
-        # TODO: Requery weather periodically
-        # self.weatherUpdateTimer = QTimer(self)
-        # self.weatherUpdateTimer.timeout.connect(self.update_weather)
-        # self.weatherUpdateTimer.start(600000)  # 10 minutes in milliseconds
+        self.update_weather_timer = QTimer(self)
+        self.update_weather_timer.timeout.connect(self.update_weather)
+        self.update_weather_timer.start(600000)  # 10 minutes in milliseconds
+
+        self.api_key = 'f9fcdaa03e740f53fdfb7eccd7c4afa1'
+        self.city_name = 'Denver'
 
         # Time label at the bottom right
         self.time_label = QLabel("00:00", self.image_label)
@@ -101,6 +103,19 @@ class PhotoFrameApp(QMainWindow):
         formatted_time = now.toString("hh:mm:ss")
         formatted_date = now.toString("dddd, MMMM dd")
         self.time_label.setText(f"{formatted_time}\n{formatted_date}")
+
+    def update_weather(self):
+        """Fetch and update weather."""
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={self.city_name}&appid={self.api_key}&units=metric"
+        response = requests.get(url)
+        data = response.json()
+
+        if data["cod"] == 200:
+            temp = data["main"]["temp"]
+            weather_description = data["weather"][0]["description"]
+            self.weather_label.setText(f"{temp}°C, {weather_description.capitalize()}")
+        else:
+            print("Failed to retrieve weather data")
 
 
 if __name__ == "__main__":
