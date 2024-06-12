@@ -27,7 +27,8 @@ class PhotoFrameApp(QMainWindow):
         self.weather_label = QLabel("Loading weather...", self.image_label)
         self.weather_label.setFont(QFont('Arial', 16))
         self.weather_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 100);")
-        self.weather_label.setGeometry(self.width() - 220, 20, 200, 40)
+        self.weather_label.setAlignment(Qt.AlignCenter)
+        self.weather_label.setGeometry(self.width() - 300, 20, 280, 50)
 
         self.update_weather_timer = QTimer(self)
         self.update_weather_timer.timeout.connect(self.update_weather)
@@ -107,14 +108,14 @@ class PhotoFrameApp(QMainWindow):
 
     def update_weather(self):
         """Fetch and update weather."""
-        url = f"http://api.openweathermap.org/data/2.5/weather?q={self.city_name}&appid={self.api_key}&units=metric"
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={self.city_name}&appid={self.api_key}&units=imperial"
         response = requests.get(url)
         data = response.json()
 
         if data["cod"] == 200:
             temp = data["main"]["temp"]
             weather_description = data["weather"][0]["description"]
-            self.weather_label.setText(f"{temp}°C, {weather_description.capitalize()}")
+            self.weather_label.setText(f"{temp}°F, {weather_description.capitalize()}")
         else:
             print("Failed to retrieve weather data")
 
