@@ -55,6 +55,7 @@ class PhotoFrameApp(QMainWindow):
         QTimer.singleShot(1000, self.update_time_loop)  # Update time every second
 
         self.update_positions()  # Update positions based on the full screen size
+        self.update_weather()
 
     def resizeEvent(self, event):
         """Handle the resize event to update widget positions."""
