@@ -6,6 +6,10 @@ from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QWidget
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtCore import QTimer, Qt, QDateTime
 
+api_key = os.getenv('OPENWEATHER_API_KEY')
+if not api_key:
+    raise RuntimeError("Please set the OPENWEATHER_API_KEY environment variable")
+
 
 class PhotoFrameApp(QMainWindow):
     def __init__(self):
@@ -34,7 +38,6 @@ class PhotoFrameApp(QMainWindow):
         self.update_weather_timer.timeout.connect(self.update_weather)
         self.update_weather_timer.start(600000)  # 10 minutes in milliseconds
 
-        self.api_key = 'f9fcdaa03e740f53fdfb7eccd7c4afa1'
         self.city_name = 'Denver'
 
         # Time label at the bottom right
@@ -108,7 +111,7 @@ class PhotoFrameApp(QMainWindow):
 
     def update_weather(self):
         """Fetch and update weather."""
-        url = f"http://api.openweathermap.org/data/2.5/weather?q={self.city_name}&appid={self.api_key}&units=imperial"
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={self.city_name}&appid={api_key}&units=imperial"
         response = requests.get(url)
         data = response.json()
 
