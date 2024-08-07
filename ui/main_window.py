@@ -12,7 +12,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Digital Photo Frame")
-        self.showFullScreen()
+
+        self.initial_setup_done = False  # Flag to ensure setup is done before handling resize events
 
         central_widget = QWidget(self)
         self.setCentralWidget(central_widget)
@@ -38,9 +39,14 @@ class MainWindow(QMainWindow):
         self.update_image()
         self.update_positions()  # Update positions based on the full screen size
 
+        self.initial_setup_done = True  # Mark the setup as complete
+        self.showFullScreen()
+
     def resizeEvent(self, event):
         """Handle the resize event to update widget positions."""
-        self.update_positions()
+        if self.initial_setup_done:
+            print("Resizing window")
+            self.update_positions()
         super().resizeEvent(event)
 
     def update_positions(self):
