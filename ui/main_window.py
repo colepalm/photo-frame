@@ -53,8 +53,10 @@ class MainWindow(QMainWindow):
         """ Update positions of labels based on the current size of the window """
         screen_size = self.size()
         self.image_label.setGeometry(0, 0, screen_size.width(), screen_size.height())
-        self.weather_widget.setGeometry(screen_size.width() - 300 - 20, 20, 280, 50)
-        time_widget_height = 60  # Increase height to fit the text better
+        weather_widget_width = 200
+        self.weather_widget.setGeometry(screen_size.width() - weather_widget_width - 20, 20,
+                                        weather_widget_width, 50)
+        time_widget_height = 60
         self.time_widget.setGeometry(screen_size.width() - 300 - 20, screen_size.height() - time_widget_height - 20,
                                      300, time_widget_height)
 

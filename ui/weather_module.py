@@ -17,6 +17,7 @@ class WeatherWidget(QLabel):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_weather)
         self.timer.start(600000)  # Update every 10 minutes
+        self.update_weather()
 
     def update_weather(self):
         data = fetch_weather(self.city_name, self.api_key)
