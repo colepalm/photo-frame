@@ -54,7 +54,9 @@ class MainWindow(QMainWindow):
         screen_size = self.size()
         self.image_label.setGeometry(0, 0, screen_size.width(), screen_size.height())
         self.weather_widget.setGeometry(screen_size.width() - 300 - 20, 20, 280, 50)
-        self.time_widget.setGeometry(screen_size.width() - 300 - 20, screen_size.height() - 50 - 20, 300, 50)
+        time_widget_height = 60  # Increase height to fit the text better
+        self.time_widget.setGeometry(screen_size.width() - 300 - 20, screen_size.height() - time_widget_height - 20,
+                                     300, time_widget_height)
 
     def load_photos(self):
         """Load the paths of photos in the directory."""
