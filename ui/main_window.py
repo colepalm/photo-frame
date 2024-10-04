@@ -3,6 +3,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget
 
 from config import api_key, city_name
+from ui.calendar_module import CalendarWidget
 from ui.time_module import TimeWidget
 from ui.weather_module import WeatherWidget
 from utils import load_photos

@@ -3,7 +3,7 @@ from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QFont
 
 from utils import fetch_calendar_events
-from google_calendar_service import get_calendar_service
+from calendar_service import get_calendar_service
 
 
 class CalendarWidget(QWidget):
