@@ -29,6 +29,8 @@ class MainWindow(QMainWindow):
         self.time_widget = TimeWidget(central_widget)
         self.time_widget.setGeometry(650, self.height() - 100, 200, 100)
 
+        self.calendar_widget = CalendarWidget(central_widget)
+
         self.photos_dir = './photos'
         self.photos_list = self.load_photos()
         self.current_photo = 0
@@ -60,6 +62,10 @@ class MainWindow(QMainWindow):
         self.time_widget.setGeometry(screen_size.width() - 300 - 20, screen_size.height() - time_widget_height - 20,
                                      300, time_widget_height)
 
+        calendar_widget_width = 400
+        calendar_widget_height = 300
+        self.calendar_widget.setGeometry(20, screen_size.height() - calendar_widget_height - 20, calendar_widget_width,
+                                         calendar_widget_height)
     def load_photos(self):
         """Load the paths of photos in the directory."""
         return load_photos(self.photos_dir)
