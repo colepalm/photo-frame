@@ -10,7 +10,6 @@ SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 
 def get_calendar_service():
     creds = None
-    # The file token.json stores the user's access and refresh tokens.
     if os.path.exists('token.json'):
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
     # If there are no (valid) credentials, let the user log in.
@@ -20,11 +19,10 @@ def get_calendar_service():
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 'credentials.json', SCOPES)
-            # Add access_type and prompt parameters
             creds = flow.run_local_server(
                 port=0, access_type='offline', prompt='consent')
         # Save the credentials for the next run.
-        with open('credentials.json', 'w') as token:
+        with open('token.json', 'w') as token:
             token.write(creds.to_json())
     service = build('calendar', 'v3', credentials=creds)
     return service

@@ -63,8 +63,8 @@ class MainWindow(QMainWindow):
         self.time_widget.setGeometry(screen_size.width() - 300 - 20, screen_size.height() - time_widget_height - 20,
                                      300, time_widget_height)
 
-        calendar_widget_width = 400
-        calendar_widget_height = 300
+        calendar_widget_width = 200
+        calendar_widget_height = 90
         self.calendar_widget.setGeometry(20, screen_size.height() - calendar_widget_height - 20, calendar_widget_width,
                                          calendar_widget_height)
     def load_photos(self):

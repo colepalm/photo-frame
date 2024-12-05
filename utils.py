@@ -15,9 +15,9 @@ def fetch_weather(city_name, api_key):
     return data
 
 
-def fetch_calendar_events(service, max_results=10):
+def fetch_calendar_events(service, max_results=1):
     import datetime
-    now = datetime.datetime.utcnow().isoformat() + 'Z'
+    now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
     events_result = service.events().list(
         calendarId='primary', timeMin=now,
         maxResults=max_results, singleEvents=True,

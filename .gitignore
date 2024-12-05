@@ -1,3 +1,6 @@
 .idea
 photos
+
+# Google API creds
 credentials.json
+token.json
