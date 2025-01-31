@@ -26,7 +26,7 @@ class MainWindow(QMainWindow):
         self.image_label.setScaledContents(True)
 
         self.weather_widget = WeatherWidget(central_widget, api_key, city_name)
-        self.weather_widget.setGeometry(self.width() - 300, 20, 280, 50)
+        self.weather_widget.setGeometry(self.width() - 300, 20, 280, 60)
 
         self.time_widget = TimeWidget(central_widget)
         self.time_widget.setGeometry(650, self.height() - 100, 200, 100)
@@ -66,7 +66,7 @@ class MainWindow(QMainWindow):
         """ Update positions of labels based on the current size of the window """
         screen_size = self.size()
         self.image_label.setGeometry(0, 0, screen_size.width(), screen_size.height())
-        weather_widget_width = 200
+        weather_widget_width = 220
         self.weather_widget.setGeometry(
             screen_size.width() - weather_widget_width - 20,
             20,
