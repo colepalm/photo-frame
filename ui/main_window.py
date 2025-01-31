@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget
 
 from config import api_key, city_name
 from ui.calendar_module import CalendarWidget
+from ui.moon_sun_widget import MoonSunWidget
 from ui.time_module import TimeWidget
 from ui.weather_module import WeatherWidget
 from utils import load_photos
@@ -32,6 +33,15 @@ class MainWindow(QMainWindow):
 
         self.calendar_widget = CalendarWidget(central_widget)
 
+        self.moon_sun_widget = MoonSunWidget(
+            city="Denver",
+            region="USA",
+            timezone="America/Denver",
+            lat=39.7872326,
+            lon=-104.9973032,
+            parent=central_widget
+        )
+
         self.photos_dir = './photos'
         self.photos_list = self.load_photos()
         self.current_photo = 0
@@ -57,14 +67,33 @@ class MainWindow(QMainWindow):
         screen_size = self.size()
         self.image_label.setGeometry(0, 0, screen_size.width(), screen_size.height())
         weather_widget_width = 200
-        self.weather_widget.setGeometry(screen_size.width() - weather_widget_width - 20, 20,
-                                        weather_widget_width, 50)
+        self.weather_widget.setGeometry(
+            screen_size.width() - weather_widget_width - 20,
+            20,
+            weather_widget_width,
+            50
+        )
+
         time_widget_height = 60
-        self.time_widget.setGeometry(screen_size.width() - 300 - 20, screen_size.height() - time_widget_height - 20,
-                                     300, time_widget_height)
+        self.time_widget.setGeometry(
+            screen_size.width() - 300 - 20,
+            screen_size.height() - time_widget_height - 20,
+            300,
+            time_widget_height
+        )
 
         calendar_widget_width = 200
         calendar_widget_height = 90
+
+        moon_sun_width = 200
+        moon_sun_height = 60
+        self.moon_sun_widget.setGeometry(
+            20,
+            20,
+            moon_sun_width,
+            moon_sun_height
+        )
+
         self.calendar_widget.setGeometry(20, screen_size.height() - calendar_widget_height - 20, calendar_widget_width,
                                          calendar_widget_height)
     def load_photos(self):
