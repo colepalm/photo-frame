@@ -7,7 +7,7 @@ from utils import fetch_weather
 class WeatherWidget(QLabel):
     def __init__(self, parent=None, api_key=None, city_name='Denver'):
         super().__init__(parent)
-        self.setFont(QFont('Arial', 16))
+        self.setFont(QFont('Arial', 18))
         self.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 100);")
         self.setAlignment(Qt.AlignCenter)
         self.setText("Loading weather...")

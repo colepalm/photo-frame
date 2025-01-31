@@ -75,15 +75,22 @@ class MainWindow(QMainWindow):
         )
 
         time_widget_height = 60
+        time_widget_width = 200
         self.time_widget.setGeometry(
-            screen_size.width() - 300 - 20,
+            screen_size.width() - time_widget_width - 20,
             screen_size.height() - time_widget_height - 20,
-            300,
+            time_widget_width,
             time_widget_height
         )
 
         calendar_widget_width = 200
         calendar_widget_height = 90
+        self.calendar_widget.setGeometry(
+            20,
+            screen_size.height() - calendar_widget_height - 20,
+            calendar_widget_width,
+            calendar_widget_height
+        )
 
         moon_sun_width = 200
         moon_sun_height = 60
@@ -94,8 +101,6 @@ class MainWindow(QMainWindow):
             moon_sun_height
         )
 
-        self.calendar_widget.setGeometry(20, screen_size.height() - calendar_widget_height - 20, calendar_widget_width,
-                                         calendar_widget_height)
     def load_photos(self):
         """Load the paths of photos in the directory."""
         return load_photos(self.photos_dir)
