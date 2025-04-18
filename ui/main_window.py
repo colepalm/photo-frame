@@ -2,7 +2,7 @@ from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget
 
-from config import api_key, city_name
+from config import api_key, city_name, photos_dir
 from ui.calendar_module import CalendarWidget
 from ui.moon_sun_widget import MoonSunWidget
 from ui.time_module import TimeWidget
@@ -42,8 +42,7 @@ class MainWindow(QMainWindow):
             parent=central_widget
         )
 
-        self.photos_dir = './photos'
-        self.photos_list = self.load_photos()
+        self.photos_list = load_photos()
         self.current_photo = 0
 
         self.timer = QTimer(self)
@@ -100,10 +99,6 @@ class MainWindow(QMainWindow):
             moon_sun_width,
             moon_sun_height
         )
-
-    def load_photos(self):
-        """Load the paths of photos in the directory."""
-        return load_photos(self.photos_dir)
 
     def update_image(self):
         """Update the image displayed on the label."""
