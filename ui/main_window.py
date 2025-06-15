@@ -1,4 +1,4 @@
-from random import random
+import random
 
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QPixmap
