@@ -1,8 +1,10 @@
+from random import random
+
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget
 
-from config import api_key, city_name, photos_dir
+from config import api_key, city_name
 from ui.calendar_module import CalendarWidget
 from ui.moon_sun_widget import MoonSunWidget
 from ui.time_module import TimeWidget
@@ -43,6 +45,7 @@ class MainWindow(QMainWindow):
         )
 
         self.photos_list = load_photos()
+        random.shuffle(self.photos_list)
         self.current_photo = 0
 
         self.timer = QTimer(self)
