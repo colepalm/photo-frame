@@ -3,4 +3,7 @@ photos
 
 # Google API creds
 credentials.json
+service-account-key.json
 token.json
+
+venv

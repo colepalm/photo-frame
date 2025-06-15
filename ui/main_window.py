@@ -1,7 +1,6 @@
 import random
-
+import io
 from PIL import Image, ExifTags
-from PIL.ImageQt import ImageQt
 
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QPixmap
@@ -106,18 +105,30 @@ class MainWindow(QMainWindow):
             # Get orientation from EXIF
             orientation = self.get_exif_orientation(image_path)
 
-            # Load image with PIL
+            # If no rotation needed, use original file
+            if orientation == 1:
+                return QPixmap(image_path)
+
+            # Load image with PIL and apply rotation
             with Image.open(image_path) as img:
                 # Convert to RGB if necessary (handles RGBA, P, etc.)
-                if img.mode != 'RGB':
+                if img.mode not in ('RGB', 'L'):
                     img = img.convert('RGB')
 
                 # Apply EXIF rotation
                 img = self.apply_exif_rotation(img, orientation)
 
                 # Convert PIL image to QPixmap
-                qt_image = ImageQt(img)
-                pixmap = QPixmap.fromImage(qt_image)
+                if IMAGEQT_AVAILABLE:
+                    qt_image = ImageQt(img)
+                    pixmap = QPixmap.fromImage(qt_image)
+                else:
+                    # Alternative method: save to bytes and load
+                    byte_array = io.BytesIO()
+                    img.save(byte_array, format='JPEG', quality=95)
+                    byte_array.seek(0)
+                    pixmap = QPixmap()
+                    pixmap.loadFromData(byte_array.getvalue())
 
                 return pixmap
 
