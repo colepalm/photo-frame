@@ -21,16 +21,41 @@ def fetch_weather(city_name, api_key):
     data = response.json()
     return data
 
-
 def fetch_calendar_events(service, max_results=1):
     import datetime
-    now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-    events_result = service.events().list(
-        calendarId='primary', timeMin=now,
-        maxResults=max_results, singleEvents=True,
-        orderBy='startTime').execute()
-    events = events_result.get('items', [])
-    return events
+    now = datetime.datetime.utcnow().isoformat() + 'Z'
+
+    calendar_ids = [
+        'palm.cole@gmail.com',
+    ]
+
+    all_events = []
+
+    for calendar_id in calendar_ids:
+        try:
+            events_result = service.events().list(
+                calendarId=calendar_id,
+                timeMin=now,
+                maxResults=max_results,
+                singleEvents=True,
+                orderBy='startTime'
+            ).execute()
+
+            events = events_result.get('items', [])
+            all_events.extend(events)
+
+        except Exception as e:
+            print(f"Error fetching from {calendar_id}: {e}")
+
+    all_events.sort(key=lambda x: x.get('start', {}).get('dateTime', x.get('start', {}).get('date', '')))
+
+    return all_events[:max_results]
+
+def list_calendars(service):
+    """Get all calendars accessible to the service account"""
+    calendars_result = service.calendarList().list().execute()
+    calendars = calendars_result.get('items', [])
+    return calendars
 
 def fetch_astral_data(city_name, region_name, timezone_name, latitude, longitude):
     """Returns today's sunrise, sunset, and moon phase for the given location."""
