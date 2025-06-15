@@ -1,8 +1,7 @@
-import requests
-
 from PyQt5.QtWidgets import QWidget, QLabel, QHBoxLayout
-from PyQt5.QtGui import QFont, QPixmap, QFontMetrics
+from PyQt5.QtGui import QFont, QPixmap, QFontMetrics, QPainter
 from PyQt5.QtCore import Qt, QTimer
+import requests
 
 from utils import fetch_weather
 
@@ -16,7 +15,8 @@ class WeatherWidget(QWidget):
         self.icon_label = QLabel()
         self.icon_label.setStyleSheet("background-color: rgba(0, 0, 0, 100);")
         self.icon_label.setAlignment(Qt.AlignCenter)
-        self.icon_label.setFixedSize(60, 60)
+        self.icon_label.setFixedWidth(60)
+        self.icon_label.setScaledContents(False)
 
         self.current_weather_text = "Loading weather..."
         self.text_label = QLabel("Loading weather...")
@@ -89,14 +89,30 @@ class WeatherWidget(QWidget):
                 pixmap = QPixmap()
                 pixmap.loadFromData(icon_data)
 
-                # Scale icon to fit the fixed size
-                pixmap = pixmap.scaled(50, 50, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                # Create a new pixmap with the label size and fill with transparent
+                label_size = self.icon_label.size()
+                centered_pixmap = QPixmap(label_size)
+                centered_pixmap.fill(Qt.transparent)
 
-                self.icon_label.setPixmap(pixmap)
+                # Scale the original icon to a reasonable size (smaller than label)
+                scaled_icon = pixmap.scaled(45, 45, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
+                # Calculate position to center the scaled icon
+                x = (label_size.width() - scaled_icon.width()) // 2
+                y = (label_size.height() - scaled_icon.height()) // 2
+
+                # Draw the scaled icon onto the centered pixmap
+                from PyQt5.QtGui import QPainter
+                painter = QPainter(centered_pixmap)
+                painter.drawPixmap(x, y, scaled_icon)
+                painter.end()
+
+                self.icon_label.setPixmap(centered_pixmap)
             except Exception as e:
                 print(f"Error fetching icon: {e}")
                 self.icon_label.clear()
 
+            # Update text with line break for better formatting
             self.text_label.setText(self.current_weather_text)
 
             # Adjust font size based on current widget size
