@@ -33,6 +33,7 @@ class CalendarWidget(QWidget):
         super().resizeEvent(event)
 
     def update_event(self):
+        debug_calendars(self.service)
         events = fetch_calendar_events(self.service)
         if not events:
             self.event_label.setText("No upcoming events found.")
@@ -47,3 +48,16 @@ class CalendarWidget(QWidget):
             if location:
                 event_text += f"\nLocation: {location}"
             self.event_label.setText(event_text)
+
+def debug_calendars(service):
+    try:
+        calendars_result = service.calendarList().list().execute()
+        calendars = calendars_result.get('items', [])
+        print("Available calendars:")
+        for cal in calendars:
+            print(f"  ID: {cal['id']}")
+            print(f"  Name: {cal['summary']}")
+            print(f"  Access: {cal.get('accessRole', 'unknown')}")
+            print("---")
+    except Exception as e:
+        print(f"Error listing calendars: {e}")
