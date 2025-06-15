@@ -118,18 +118,6 @@ class MainWindow(QMainWindow):
                 # Apply EXIF rotation
                 img = self.apply_exif_rotation(img, orientation)
 
-                # Convert PIL image to QPixmap
-                if IMAGEQT_AVAILABLE:
-                    qt_image = ImageQt(img)
-                    pixmap = QPixmap.fromImage(qt_image)
-                else:
-                    # Alternative method: save to bytes and load
-                    byte_array = io.BytesIO()
-                    img.save(byte_array, format='JPEG', quality=95)
-                    byte_array.seek(0)
-                    pixmap = QPixmap()
-                    pixmap.loadFromData(byte_array.getvalue())
-
                 return pixmap
 
         except Exception as e:
