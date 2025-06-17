@@ -1,7 +1,8 @@
-import random
 import io
-from PIL import Image, ExifTags
+import pillow_heif
+import random
 
+from PIL import Image, ExifTags
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget
@@ -13,6 +14,7 @@ from ui.time_module import TimeWidget
 from ui.weather_module import WeatherWidget
 from utils import load_photos
 
+pillow_heif.register_heif_opener()
 
 class MainWindow(QMainWindow):
     def __init__(self):
