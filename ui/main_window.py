@@ -1,5 +1,4 @@
 import io
-import pillow_heif
 import random
 
 from PIL import Image, ExifTags
@@ -13,8 +12,6 @@ from ui.moon_sun_widget import MoonSunWidget
 from ui.time_module import TimeWidget
 from ui.weather_module import WeatherWidget
 from utils import load_photos
-
-pillow_heif.register_heif_opener()
 
 class MainWindow(QMainWindow):
     def __init__(self):
