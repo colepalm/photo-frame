@@ -11,7 +11,7 @@ from config import photos_dir
 
 def load_photos():
     files = [os.path.join(photos_dir, f) for f in os.listdir(photos_dir) if
-             f.lower().endswith(('.png', '.jpg', '.jpeg', '.heic'))]
+             f.lower().endswith(('.png', '.jpg', '.jpeg'))]
     return files
 
 
