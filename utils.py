@@ -27,6 +27,7 @@ def fetch_calendar_events(service, max_results=1):
 
     calendar_ids = [
         'palm.cole@gmail.com',
+        'shannon.melvina@gmail.com'
     ]
 
     all_events = []
