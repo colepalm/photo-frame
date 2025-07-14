@@ -1,7 +1,7 @@
 import io
 import random
 
-from PIL import Image, ExifTags
+from PIL import Image
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget
@@ -111,12 +111,22 @@ class MainWindow(QMainWindow):
         """ Update positions of labels based on the current size of the window """
         screen_size = self.size()
         self.image_label.setGeometry(0, 0, screen_size.width(), screen_size.height())
-        weather_widget_width = 220
+
+        weather_widget_width = min(280, screen_size.width() // 4)  # Responsive width
+        weather_margin = 20
+        weather_widget_height = min(100, screen_size.height() // 15)  # Responsive height
+
+        weather_x = max(weather_margin, screen_size.width() - weather_widget_width - weather_margin)
+        weather_y = weather_margin
+
+        # Ensure it doesn't go off the top/bottom
+        weather_y = max(weather_margin, min(weather_y, screen_size.height() - weather_widget_height - weather_margin))
+
         self.weather_widget.setGeometry(
-            screen_size.width() - weather_widget_width - 20,
-            20,
+            weather_x,
+            weather_y,
             weather_widget_width,
-            50
+            weather_widget_height
         )
 
         time_widget_height = 60
