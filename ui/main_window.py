@@ -13,6 +13,34 @@ from ui.time_module import TimeWidget
 from ui.weather_module import WeatherWidget
 from utils import load_photos
 
+
+def load_and_process_image(image_path):
+    """Load an image and apply EXIF orientation correction."""
+    try:
+        from PIL import ImageOps
+
+        with Image.open(image_path) as img:
+            # Convert to RGB if necessary
+            if img.mode not in ('RGB', 'L'):
+                img = img.convert('RGB')
+
+            img = ImageOps.exif_transpose(img)
+
+            # Convert to QPixmap
+            buffer = io.BytesIO()
+            img.save(buffer, format='JPEG', quality=95)
+            buffer.seek(0)
+
+            pixmap = QPixmap()
+            pixmap.loadFromData(buffer.getvalue())
+
+            return pixmap
+
+    except Exception as e:
+        print(f"Error processing image {image_path}: {e}")
+        return QPixmap(image_path)
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -59,95 +87,6 @@ class MainWindow(QMainWindow):
 
         self.initial_setup_done = True  # Mark the setup as complete
         self.showFullScreen()
-
-    @staticmethod
-    def get_exif_orientation(image_path):
-        """Get the EXIF orientation value from an image."""
-        try:
-            with Image.open(image_path) as img:
-                exif = img._getexif()
-                if exif is not None:
-                    for tag, value in exif.items():
-                        if ExifTags.TAGS.get(tag) == 'Orientation':
-                            return value
-        except Exception as e:
-            print(f"Error reading EXIF data from {image_path}: {e}")
-        return 1  # Default orientation (no rotation needed)
-
-    @staticmethod
-    def apply_exif_rotation(image, orientation):
-        """Apply rotation based on EXIF orientation value."""
-        rotation_map = {
-            1: 0,  # Normal
-            2: 0,  # Mirrored horizontally
-            3: 180,  # Rotated 180°
-            4: 180,  # Mirrored vertically
-            5: 90,  # Mirrored horizontally and rotated 90° CCW
-            6: 270,  # Rotated 90° CW
-            7: 270,  # Mirrored horizontally and rotated 90° CW
-            8: 90,  # Rotated 90° CCW
-        }
-
-        rotation = rotation_map.get(orientation, 0)
-        if rotation != 0:
-            image = image.rotate(-rotation, expand=True)
-
-        # Handle mirroring for orientations 2, 4, 5, 7
-        if orientation in [2, 4, 5, 7]:
-            image = image.transpose(Image.FLIP_LEFT_RIGHT)
-
-        return image
-
-    def load_and_process_image(self, image_path):
-        """Load an image and apply EXIF orientation correction."""
-        try:
-            # Get orientation from EXIF
-            orientation = self.get_exif_orientation(image_path)
-
-            # If no rotation needed, use original file
-            if orientation == 1:
-                return QPixmap(image_path)
-
-            # Load image with PIL and apply rotation
-            with Image.open(image_path) as img:
-                # Convert to RGB if necessary (handles RGBA, P, etc.)
-                if img.mode not in ('RGB', 'L'):
-                    img = img.convert('RGB')
-
-                # Apply EXIF rotation
-                img = self.apply_exif_rotation(img, orientation)
-
-                # Convert PIL image to QPixmap
-                # Save to BytesIO buffer
-                buffer = io.BytesIO()
-                img.save(buffer, format='JPEG', quality=95)
-                buffer.seek(0)
-
-                # Create QPixmap from buffer
-                pixmap = QPixmap()
-                pixmap.loadFromData(buffer.getvalue())
-
-                return pixmap
-
-        except Exception as e:
-            print(f"Error processing image {image_path}: {e}")
-            # Fallback to original method
-            return QPixmap(image_path)
-
-    @staticmethod
-    def get_best_fit_scaling(image_size, container_size):
-        """Calculate the best scaling to fit image in container while maintaining aspect ratio."""
-        img_width, img_height = image_size
-        container_width, container_height = container_size
-
-        # Calculate scaling factors for both dimensions
-        scale_x = container_width / img_width
-        scale_y = container_height / img_height
-
-        # Use the smaller scale to ensure the image fits completely
-        scale = min(scale_x, scale_y)
-
-        return scale
 
     def resizeEvent(self, event):
         """Handle the resize event to update widget positions."""
@@ -217,7 +156,7 @@ class MainWindow(QMainWindow):
         print(f"Loading image: {photo_path}")
 
         # Load and process the image with EXIF orientation correction
-        pixmap = self.load_and_process_image(photo_path)
+        pixmap = load_and_process_image(photo_path)
 
         # Store the original pixmap for resizing
         self.current_pixmap = pixmap
