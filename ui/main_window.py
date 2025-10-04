@@ -77,8 +77,19 @@ class MainWindow(QMainWindow):
         )
 
         self.forecast_view = ForecastView(central_widget, api_key, city_name)
-        self.forecast_view.hide()
+        self.forecast_view.hide()  # Initially hidden
+
         self.showing_forecast = False
+
+        # Timer to show forecast view periodically
+        self.forecast_display_timer = QTimer(self)
+        self.forecast_display_timer.timeout.connect(self.show_forecast_temporarily)
+        self.forecast_display_timer.start(600000)  # Show every 10 minutes
+
+        # Timer to hide forecast view after displaying
+        self.forecast_hide_timer = QTimer(self)
+        self.forecast_hide_timer.timeout.connect(self.hide_forecast_view)
+        self.forecast_hide_timer.setSingleShot(True)
 
         self.photos_list = load_photos()
         random.shuffle(self.photos_list)
@@ -92,6 +103,7 @@ class MainWindow(QMainWindow):
 
         self.initial_setup_done = True  # Mark the setup as complete
         self.showFullScreen()
+        self.show_forecast_temporarily()
 
     def resizeEvent(self, event):
         """Handle the resize event to update widget positions."""
@@ -117,9 +129,9 @@ class MainWindow(QMainWindow):
         screen_size = self.size()
         self.image_label.setGeometry(0, 0, screen_size.width(), screen_size.height())
 
-        weather_widget_width = min(280, screen_size.width() // 4)  # Responsive width
+        weather_widget_width = min(280, screen_size.width() // 4)
         weather_margin = 20
-        weather_widget_height = min(100, screen_size.height() // 15)  # Responsive height
+        weather_widget_height = min(100, screen_size.height() // 15)
 
         weather_x = max(weather_margin, screen_size.width() - weather_widget_width - weather_margin)
         weather_y = weather_margin
@@ -193,16 +205,20 @@ class MainWindow(QMainWindow):
         self.timer.timeout.connect(self.update_image)
         self.timer.start(120000)  # Change image every 120 seconds
 
-    def toggle_forecast_view(self):
-        """Toggle the forecast view visibility"""
-        if self.showing_forecast:
-            self.forecast_view.hide()
-            self.showing_forecast = False
-        else:
+    def show_forecast_temporarily(self):
+        """Show the forecast view temporarily"""
+        if not self.showing_forecast:
             self.update_forecast_view_position()
             self.forecast_view.show()
             self.forecast_view.raise_()  # Bring to front
             self.showing_forecast = True
+            # Hide after 30 seconds
+            self.forecast_hide_timer.start(30000)
+
+    def hide_forecast_view(self):
+        """Hide the forecast view"""
+        self.forecast_view.hide()
+        self.showing_forecast = False
 
     def update_forecast_view_position(self):
         """Position the forecast view to cover most of the screen"""
