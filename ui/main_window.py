@@ -103,7 +103,6 @@ class MainWindow(QMainWindow):
 
         self.initial_setup_done = True  # Mark the setup as complete
         self.showFullScreen()
-        self.show_forecast_temporarily()
 
     def resizeEvent(self, event):
         """Handle the resize event to update widget positions."""
