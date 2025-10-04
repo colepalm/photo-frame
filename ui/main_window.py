@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QMainWindow, QLabel, QWidget
 
 from config import api_key, city_name
 from ui.calendar_module import CalendarWidget
+from ui.forecast_view import ForecastView
 from ui.moon_sun_widget import MoonSunWidget
 from ui.time_module import TimeWidget
 from ui.weather_module import WeatherWidget
@@ -75,6 +76,10 @@ class MainWindow(QMainWindow):
             parent=central_widget
         )
 
+        self.forecast_view = ForecastView(central_widget, api_key, city_name)
+        self.forecast_view.hide()
+        self.showing_forecast = False
+
         self.photos_list = load_photos()
         random.shuffle(self.photos_list)
         self.current_photo = 0
@@ -118,8 +123,6 @@ class MainWindow(QMainWindow):
 
         weather_x = max(weather_margin, screen_size.width() - weather_widget_width - weather_margin)
         weather_y = weather_margin
-
-        # Ensure it doesn't go off the top/bottom
         weather_y = max(weather_margin, min(weather_y, screen_size.height() - weather_widget_height - weather_margin))
 
         self.weather_widget.setGeometry(
@@ -156,6 +159,10 @@ class MainWindow(QMainWindow):
             moon_sun_height
         )
 
+        # Update forecast view position if it's showing
+        if self.showing_forecast:
+            self.update_forecast_view_position()
+
     def update_image(self):
         """Update the image displayed on the label."""
         if not self.photos_list:
@@ -185,3 +192,27 @@ class MainWindow(QMainWindow):
         """Change the photo at intervals."""
         self.timer.timeout.connect(self.update_image)
         self.timer.start(120000)  # Change image every 120 seconds
+
+    def toggle_forecast_view(self):
+        """Toggle the forecast view visibility"""
+        if self.showing_forecast:
+            self.forecast_view.hide()
+            self.showing_forecast = False
+        else:
+            self.update_forecast_view_position()
+            self.forecast_view.show()
+            self.forecast_view.raise_()  # Bring to front
+            self.showing_forecast = True
+
+    def update_forecast_view_position(self):
+        """Position the forecast view to cover most of the screen"""
+        screen_size = self.size()
+
+        # Make it take up most of the screen with margins
+        margin = 50
+        self.forecast_view.setGeometry(
+            margin,
+            margin,
+            screen_size.width() - (margin * 2),
+            screen_size.height() - (margin * 2)
+        )
