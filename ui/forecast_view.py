@@ -12,11 +12,11 @@ class ForecastView(QWidget):
         self.api_key = api_key
         self.city_name = city_name
 
+        # Set background with slight transparency
         self.setStyleSheet("""
             QWidget {
-                background-color: rgba(0, 0, 0, 220);
-                border-radius: 10px;
-                padding: 15px;
+                background-color: rgba(0, 0, 0, 180);
+                border-radius: 15px;
             }
         """)
 
@@ -63,15 +63,18 @@ class ForecastView(QWidget):
         day_frame = QFrame()
         day_frame.setStyleSheet("""
             QFrame {
-                background-color: rgba(255, 255, 255, 0.7);
+                background-color: rgba(255, 255, 255, 20);
                 border-radius: 10px;
                 padding: 15px;
             }
         """)
+        day_frame.setMinimumWidth(150)
+        day_frame.setMaximumWidth(200)
 
         layout = QVBoxLayout(day_frame)
         layout.setSpacing(10)
         layout.setAlignment(Qt.AlignCenter)
+        layout.setContentsMargins(10, 10, 10, 10)
 
         # Day name
         day_label = QLabel("Day")
@@ -82,9 +85,10 @@ class ForecastView(QWidget):
             background-color: transparent;
         """)
         day_label.setAlignment(Qt.AlignCenter)
+        day_label.setFixedHeight(35)
         layout.addWidget(day_label)
 
-        # Weather icon placeholder
+        # Weather icon (placeholder)
         icon_label = QLabel("☀️")
         icon_label.setStyleSheet("""
             color: white;
@@ -92,6 +96,7 @@ class ForecastView(QWidget):
             background-color: transparent;
         """)
         icon_label.setAlignment(Qt.AlignCenter)
+        icon_label.setFixedHeight(80)
         layout.addWidget(icon_label)
 
         # High temperature
@@ -103,6 +108,7 @@ class ForecastView(QWidget):
             background-color: transparent;
         """)
         high_temp_label.setAlignment(Qt.AlignCenter)
+        high_temp_label.setFixedHeight(40)
         layout.addWidget(high_temp_label)
 
         # Low temperature
@@ -113,6 +119,7 @@ class ForecastView(QWidget):
             background-color: transparent;
         """)
         low_temp_label.setAlignment(Qt.AlignCenter)
+        low_temp_label.setFixedHeight(35)
         layout.addWidget(low_temp_label)
 
         # Weather description
@@ -124,6 +131,7 @@ class ForecastView(QWidget):
         """)
         desc_label.setAlignment(Qt.AlignCenter)
         desc_label.setWordWrap(True)
+        desc_label.setFixedHeight(50)
         layout.addWidget(desc_label)
 
         # Store references to labels
@@ -178,34 +186,49 @@ class ForecastView(QWidget):
                     forecasts[date]["temps"].append(entry['main']['temp'])
                     forecasts[date]["weather"].append(entry['weather'][0])
 
-                # Take up to 5 days (since that’s what /forecast gives)
-                for i, (date, values) in enumerate(list(forecasts.items())[:7]):
-                    if i < len(self.day_widgets):
-                        day_widget = self.day_widgets[i]
+                # Process available days (5-day forecast gives us ~5-6 days)
+                day_count = 0
+                for i, (date, values) in enumerate(list(forecasts.items())):
+                    if day_count >= len(self.day_widgets):
+                        break
 
-                        # Day name
-                        day_name = date.strftime("%a") if i > 0 else "Today"
-                        day_widget.day_label.setText(day_name)
+                    day_widget = self.day_widgets[day_count]
 
-                        # Temps
-                        high_temp = round(max(values['temps']))
-                        low_temp = round(min(values['temps']))
-                        day_widget.high_temp_label.setText(f"{high_temp}°")
-                        day_widget.low_temp_label.setText(f"{low_temp}°")
+                    # Day name
+                    today = datetime.now().date()
+                    if date == today:
+                        day_name = "Today"
+                    elif date == today.replace(day=today.day + 1):
+                        day_name = "Tomorrow"
+                    else:
+                        day_name = date.strftime("%A")
+                    day_widget.day_label.setText(day_name)
 
-                        # Choose a representative weather (e.g. midday entry)
-                        rep_weather = values['weather'][len(values['weather']) // 2]
-                        weather_id = rep_weather['id']
-                        emoji = self.get_weather_emoji(weather_id)
-                        day_widget.icon_label.setText(emoji)
+                    # Temps
+                    high_temp = round(max(values['temps']))
+                    low_temp = round(min(values['temps']))
+                    day_widget.high_temp_label.setText(f"{high_temp}°")
+                    day_widget.low_temp_label.setText(f"{low_temp}°")
 
-                        description = rep_weather['description'].title()
-                        day_widget.desc_label.setText(description)
+                    # Choose a representative weather (e.g. midday entry)
+                    rep_weather = values['weather'][len(values['weather']) // 2]
+                    weather_id = rep_weather['id']
+                    emoji = self.get_weather_emoji(weather_id)
+                    day_widget.icon_label.setText(emoji)
 
-                print("Forecast updated successfully")
+                    description = rep_weather['description'].title()
+                    day_widget.desc_label.setText(description)
+
+                    day_widget.show()
+                    day_count += 1
+
+                # Hide unused day widgets
+                for i in range(day_count, len(self.day_widgets)):
+                    self.day_widgets[i].hide()
+
+                print(f"Forecast updated successfully - {day_count} days displayed")
             else:
-                print(f"Error fetching forecast: {response.status_code} - {response.text}")
+                print(f"Error fetching forecast: {response.status_code}")
 
         except Exception as e:
             print(f"Error updating forecast: {e}")
-
