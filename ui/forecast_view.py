@@ -1,6 +1,7 @@
 import requests
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame
 from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QFont, QPixmap
 from datetime import datetime
 
 
@@ -25,17 +26,6 @@ class ForecastView(QWidget):
         self.main_layout.setContentsMargins(40, 40, 40, 40)
         self.main_layout.setSpacing(30)
 
-        # Title
-        self.title_label = QLabel("7-Day Forecast")
-        self.title_label.setStyleSheet("""
-            color: white;
-            font-size: 48px;
-            font-weight: bold;
-            background-color: transparent;
-        """)
-        self.title_label.setAlignment(Qt.AlignCenter)
-        self.main_layout.addWidget(self.title_label)
-
         # Container for forecast days
         self.forecast_container = QHBoxLayout()
         self.forecast_container.setSpacing(20)
@@ -44,7 +34,7 @@ class ForecastView(QWidget):
         # Store day widgets
         self.day_widgets = []
 
-        # Placeholder day widgets
+        # Create placeholder day widgets
         for i in range(7):
             day_widget = self.create_day_widget()
             self.day_widgets.append(day_widget)
@@ -56,82 +46,78 @@ class ForecastView(QWidget):
         # Set up timer to refresh every 30 minutes
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_forecast)
-        self.timer.start(1800000)
+        self.timer.start(1800000)  # 30 minutes
 
     def create_day_widget(self):
         """Create a widget for a single day's forecast"""
         day_frame = QFrame()
         day_frame.setStyleSheet("""
             QFrame {
-                background-color: rgba(255, 255, 255, 20);
+                background-color: rgba(50, 50, 50, 120);
                 border-radius: 10px;
-                padding: 15px;
             }
         """)
-        day_frame.setMinimumWidth(150)
-        day_frame.setMaximumWidth(200)
+        day_frame.setMinimumWidth(180)
+        day_frame.setMaximumWidth(220)
+        day_frame.setMinimumHeight(320)
+        day_frame.setMaximumHeight(340)
 
         layout = QVBoxLayout(day_frame)
-        layout.setSpacing(10)
+        layout.setSpacing(12)
         layout.setAlignment(Qt.AlignCenter)
-        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setContentsMargins(20, 20, 20, 20)
 
         # Day name
         day_label = QLabel("Day")
         day_label.setStyleSheet("""
             color: white;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
             background-color: transparent;
         """)
         day_label.setAlignment(Qt.AlignCenter)
-        day_label.setFixedHeight(35)
         layout.addWidget(day_label)
 
         # Weather icon (placeholder)
         icon_label = QLabel("☀️")
         icon_label.setStyleSheet("""
             color: white;
-            font-size: 64px;
+            font-size: 56px;
             background-color: transparent;
         """)
         icon_label.setAlignment(Qt.AlignCenter)
-        icon_label.setFixedHeight(80)
         layout.addWidget(icon_label)
 
         # High temperature
         high_temp_label = QLabel("--°")
         high_temp_label.setStyleSheet("""
             color: #FF6B6B;
-            font-size: 32px;
+            font-size: 28px;
             font-weight: bold;
             background-color: transparent;
         """)
         high_temp_label.setAlignment(Qt.AlignCenter)
-        high_temp_label.setFixedHeight(40)
         layout.addWidget(high_temp_label)
 
         # Low temperature
         low_temp_label = QLabel("--°")
         low_temp_label.setStyleSheet("""
             color: #4ECDC4;
-            font-size: 28px;
+            font-size: 24px;
             background-color: transparent;
         """)
         low_temp_label.setAlignment(Qt.AlignCenter)
-        low_temp_label.setFixedHeight(35)
         layout.addWidget(low_temp_label)
 
         # Weather description
         desc_label = QLabel("Loading...")
         desc_label.setStyleSheet("""
             color: #CCCCCC;
-            font-size: 16px;
+            font-size: 14px;
             background-color: transparent;
         """)
         desc_label.setAlignment(Qt.AlignCenter)
         desc_label.setWordWrap(True)
-        desc_label.setFixedHeight(50)
         layout.addWidget(desc_label)
 
         # Store references to labels
@@ -168,7 +154,9 @@ class ForecastView(QWidget):
     def update_forecast(self):
         """Fetch and update forecast data"""
         try:
+            # OpenWeatherMap API call for 7-day forecast
             url = f"https://api.openweathermap.org/data/2.5/forecast?q={self.city_name}&appid={self.api_key}&units=imperial"
+
             response = requests.get(url, timeout=10)
 
             if response.status_code == 200:
