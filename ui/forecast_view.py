@@ -130,26 +130,26 @@ class ForecastView(QWidget):
         return day_frame
 
     def get_weather_emoji(self, weather_id):
-        """Convert weather ID to emoji"""
+        """Convert weather ID to emoji/symbol"""
         if 200 <= weather_id < 300:
-            return "⛈️"
+            return "⚡"
         elif 300 <= weather_id < 400:
-            return "🌦️"
+            return "🌦"
         elif 500 <= weather_id < 600:
-            return "🌧️"
+            return "☔"
         elif 600 <= weather_id < 700:
-            return "❄️"
+            return "❄"
         elif 700 <= weather_id < 800:
-            return "🌫️"
+            return "≡"
         elif weather_id == 800:
-            return "☀️"
+            return "☀"
         elif weather_id == 801:
-            return "🌤️"
+            return "🌤"
         elif weather_id == 802:
             return "⛅"
         elif weather_id > 802:
-            return "☁️"
-        return "🌡️"
+            return "☁"
+        return "🌡"
 
     def update_forecast(self):
         """Fetch and update forecast data"""
