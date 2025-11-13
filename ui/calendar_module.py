@@ -47,11 +47,11 @@ class CalendarWidget(QWidget):
             formatted_start = start_dt.strftime('%b %d')
             event_text = f"{formatted_start}: {summary}"
         else:
-            # For timed events, show time and title
             start = event['start'].get('dateTime', event['start'].get('date'))
             start_dt = datetime.datetime.fromisoformat(start.replace('Z', '+00:00'))
+            formatted_date = start_dt.strftime('%b %d')
             formatted_time = start_dt.strftime('%I:%M %p')
-            event_text = f"{formatted_time}\n{summary}"
+            event_text = f"{formatted_date} {formatted_time}\n{summary}"
 
         return event_text
 
