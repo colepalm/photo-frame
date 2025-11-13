@@ -6,7 +6,7 @@ from PyQt5.QtCore import QTimer, QDateTime, Qt
 class TimeWidget(QLabel):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setFont(QFont('Arial', 18))
+        self.setFont(QFont('Arial', 14))
         self.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 100);")
         self.setAlignment(Qt.AlignCenter)
         QTimer.singleShot(1000, self.update_time)  # Update time every second

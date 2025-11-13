@@ -79,8 +79,6 @@ class CalendarWidget(QWidget):
             display_parts.append(self.format_event(all_day_events[0], is_all_day=True))
 
         if timed_events:
-            if display_parts:
-                display_parts.append("")  # Add spacing
             display_parts.append(self.format_event(timed_events[0], is_all_day=False))
 
         # If we only have all-day events, show just the first one
