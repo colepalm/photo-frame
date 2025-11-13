@@ -14,6 +14,6 @@ class TimeWidget(QLabel):
     def update_time(self):
         now = QDateTime.currentDateTime()
         formatted_time = now.toString("hh:mm:ss")
-        formatted_date = now.toString("dddd, MMMM dd")
+        formatted_date = now.toString("ddd, MMMM dd")
         self.setText(f"{formatted_time}\n{formatted_date}")
         QTimer.singleShot(1000, self.update_time)  # Continuously update time

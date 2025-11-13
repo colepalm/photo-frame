@@ -14,18 +14,29 @@ class CalendarWidget(QWidget):
         self.service = get_calendar_service()
 
         self.layout = QVBoxLayout()
+        self.layout.setContentsMargins(5, 5, 5, 5)
         self.setLayout(self.layout)
 
         self.event_label = QLabel(self)
         self.event_label.setFont(QFont('Arial', 14))
-        self.event_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 100);")
+        self.event_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 100); padding: 5px;")
         self.event_label.setAlignment(Qt.AlignCenter)
         self.event_label.setWordWrap(True)
+
+        self.setMinimumHeight(110)
 
         self.update_event()
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_event)
         self.timer.start(600000)  # Update every 10 minutes
+
+    def sizeHint(self):
+        """Provide a size hint based on content."""
+        return self.event_label.sizeHint()
+
+    def minimumSizeHint(self):
+        """Provide minimum size based on content."""
+        return self.event_label.minimumSizeHint()
 
     def resizeEvent(self, event):
         """Ensure the label fills the widget."""
@@ -61,6 +72,7 @@ class CalendarWidget(QWidget):
 
         if not events:
             self.event_label.setText("No upcoming events found.")
+            self.adjustSize()
             return
 
         all_day_events = []
@@ -86,3 +98,5 @@ class CalendarWidget(QWidget):
             display_parts = [self.format_event(all_day_events[0], is_all_day=True)]
 
         self.event_label.setText("\n".join(display_parts))
+        self.event_label.adjustSize()
+        self.adjustSize()
