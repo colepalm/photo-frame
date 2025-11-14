@@ -1,7 +1,8 @@
 import requests
+
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QFont, QPixmap
+from PyQt5.QtCore import Qt, QTimer, QByteArray
+from PyQt5.QtSvg import QSvgWidget
 from datetime import datetime
 
 
@@ -78,15 +79,10 @@ class ForecastView(QWidget):
         day_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(day_label)
 
-        # Weather icon (placeholder)
-        icon_label = QLabel("☀️")
-        icon_label.setStyleSheet("""
-            color: white;
-            font-size: 56px;
-            background-color: transparent;
-        """)
-        icon_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(icon_label)
+        # Weather icon - using SVG widget
+        icon_widget = QSvgWidget()
+        icon_widget.setFixedSize(64, 64)
+        layout.addWidget(icon_widget)
 
         # High temperature
         high_temp_label = QLabel("--°")
@@ -122,34 +118,77 @@ class ForecastView(QWidget):
 
         # Store references to labels
         day_frame.day_label = day_label
-        day_frame.icon_label = icon_label
+        day_frame.icon_widget = icon_widget
         day_frame.high_temp_label = high_temp_label
         day_frame.low_temp_label = low_temp_label
         day_frame.desc_label = desc_label
 
         return day_frame
 
-    def get_weather_emoji(self, weather_id):
-        """Convert weather ID to emoji/symbol"""
-        if 200 <= weather_id < 300:
-            return "⚡"
-        elif 300 <= weather_id < 400:
-            return "🌦"
-        elif 500 <= weather_id < 600:
-            return "☔"
-        elif 600 <= weather_id < 700:
-            return "❄"
-        elif 700 <= weather_id < 800:
-            return "≡"
-        elif weather_id == 800:
-            return "☀"
-        elif weather_id == 801:
-            return "🌤"
-        elif weather_id == 802:
-            return "⛅"
+    def get_weather_svg(self, weather_id):
+        """Return SVG data for weather condition"""
+        # Clear/Sunny
+        if weather_id == 800:
+            return """<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="32" cy="32" r="12" fill="#FFD700"/>
+                <line x1="32" y1="8" x2="32" y2="16" stroke="#FFD700" stroke-width="3"/>
+                <line x1="32" y1="48" x2="32" y2="56" stroke="#FFD700" stroke-width="3"/>
+                <line x1="8" y1="32" x2="16" y2="32" stroke="#FFD700" stroke-width="3"/>
+                <line x1="48" y1="32" x2="56" y2="32" stroke="#FFD700" stroke-width="3"/>
+                <line x1="14" y1="14" x2="20" y2="20" stroke="#FFD700" stroke-width="3"/>
+                <line x1="44" y1="44" x2="50" y2="50" stroke="#FFD700" stroke-width="3"/>
+                <line x1="50" y1="14" x2="44" y2="20" stroke="#FFD700" stroke-width="3"/>
+                <line x1="20" y1="44" x2="14" y2="50" stroke="#FFD700" stroke-width="3"/>
+            </svg>"""
+        # Cloudy
         elif weather_id > 802:
-            return "☁"
-        return "🌡"
+            return """<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="28" cy="36" rx="16" ry="12" fill="#95A5A6"/>
+                <ellipse cx="40" cy="32" rx="14" ry="10" fill="#BDC3C7"/>
+                <ellipse cx="20" cy="32" rx="12" ry="9" fill="#7F8C8D"/>
+            </svg>"""
+        # Partly Cloudy
+        elif weather_id == 801 or weather_id == 802:
+            return """<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="20" r="10" fill="#FFD700"/>
+                <line x1="24" y1="6" x2="24" y2="12" stroke="#FFD700" stroke-width="2"/>
+                <line x1="10" y1="20" x2="16" y2="20" stroke="#FFD700" stroke-width="2"/>
+                <ellipse cx="35" cy="40" rx="16" ry="11" fill="#BDC3C7"/>
+                <ellipse cx="22" cy="38" rx="12" ry="9" fill="#95A5A6"/>
+            </svg>"""
+        # Rain
+        elif 500 <= weather_id < 600:
+            return """<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="32" cy="24" rx="18" ry="12" fill="#95A5A6"/>
+                <line x1="22" y1="38" x2="20" y2="48" stroke="#3498DB" stroke-width="3"/>
+                <line x1="32" y1="38" x2="30" y2="48" stroke="#3498DB" stroke-width="3"/>
+                <line x1="42" y1="38" x2="40" y2="48" stroke="#3498DB" stroke-width="3"/>
+            </svg>"""
+        # Snow
+        elif 600 <= weather_id < 700:
+            return """<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="32" cy="24" rx="18" ry="12" fill="#95A5A6"/>
+                <circle cx="22" cy="42" r="3" fill="#ECF0F1"/>
+                <circle cx="32" cy="44" r="3" fill="#ECF0F1"/>
+                <circle cx="42" cy="42" r="3" fill="#ECF0F1"/>
+                <circle cx="27" cy="50" r="3" fill="#ECF0F1"/>
+                <circle cx="37" cy="50" r="3" fill="#ECF0F1"/>
+            </svg>"""
+        # Thunderstorm
+        elif 200 <= weather_id < 300:
+            return """<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="32" cy="20" rx="18" ry="12" fill="#7F8C8D"/>
+                <polygon points="32,28 28,40 34,40 30,52 38,36 32,36" fill="#FFD700"/>
+            </svg>"""
+        # Drizzle/Mist
+        else:
+            return """<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="32" cy="24" rx="18" ry="12" fill="#BDC3C7"/>
+                <line x1="20" y1="38" x2="20" y2="44" stroke="#5DADE2" stroke-width="2"/>
+                <line x1="28" y1="40" x2="28" y2="46" stroke="#5DADE2" stroke-width="2"/>
+                <line x1="36" y1="38" x2="36" y2="44" stroke="#5DADE2" stroke-width="2"/>
+                <line x1="44" y1="40" x2="44" y2="46" stroke="#5DADE2" stroke-width="2"/>
+            </svg>"""
 
     def update_forecast(self):
         """Fetch and update forecast data"""
@@ -201,8 +240,8 @@ class ForecastView(QWidget):
                     # Choose a representative weather (e.g. midday entry)
                     rep_weather = values['weather'][len(values['weather']) // 2]
                     weather_id = rep_weather['id']
-                    emoji = self.get_weather_emoji(weather_id)
-                    day_widget.icon_label.setText(emoji)
+                    svg_data = self.get_weather_svg(weather_id)
+                    day_widget.icon_widget.load(QByteArray(svg_data.encode()))
 
                     description = rep_weather['description'].title()
                     day_widget.desc_label.setText(description)

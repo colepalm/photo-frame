@@ -77,14 +77,14 @@ class MainWindow(QMainWindow):
         )
 
         self.forecast_view = ForecastView(central_widget, api_key, city_name)
-        self.forecast_view.hide()  # Initially hidden
+        self.forecast_view.hide()
 
         self.showing_forecast = False
 
         # Timer to show forecast view periodically
         self.forecast_display_timer = QTimer(self)
         self.forecast_display_timer.timeout.connect(self.show_forecast_temporarily)
-        self.forecast_display_timer.start(600000)  # Show every 10 minutes
+        self.forecast_display_timer.start(1800000)
 
         # Timer to hide forecast view after displaying
         self.forecast_hide_timer = QTimer(self)
@@ -152,7 +152,7 @@ class MainWindow(QMainWindow):
             time_widget_height
         )
 
-        calendar_widget_width = 200
+        calendar_widget_width = 250
         self.calendar_widget.setFixedWidth(calendar_widget_width)
         self.calendar_widget.adjustSize()
         self.calendar_widget.move(
