@@ -23,7 +23,8 @@ class CalendarWidget(QWidget):
         self.event_label.setAlignment(Qt.AlignCenter)
         self.event_label.setWordWrap(True)
 
-        self.setMinimumHeight(110)
+        self.setMinimumSize(180, 110)
+        self.setMaximumWidth(300)
 
         self.update_event()
         self.timer = QTimer(self)
@@ -55,13 +56,13 @@ class CalendarWidget(QWidget):
             # For all-day events, just show the date and title
             start = event['start'].get('date')
             start_dt = datetime.datetime.fromisoformat(start)
-            formatted_start = start_dt.strftime('%b %d')
+            formatted_start = start_dt.strftime('%m/%d')
             event_text = f"{formatted_start}: {summary}"
         else:
             start = event['start'].get('dateTime', event['start'].get('date'))
             start_dt = datetime.datetime.fromisoformat(start.replace('Z', '+00:00'))
-            formatted_date = start_dt.strftime('%b %d')
-            formatted_time = start_dt.strftime('%I:%M %p')
+            formatted_date = start_dt.strftime('%m/%d')
+            formatted_time = start_dt.strftime('%I:%M%p')
             event_text = f"{formatted_date} {formatted_time}\n{summary}"
 
         return event_text
