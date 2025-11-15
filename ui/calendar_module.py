@@ -23,8 +23,8 @@ class CalendarWidget(QWidget):
         self.event_label.setAlignment(Qt.AlignCenter)
         self.event_label.setWordWrap(True)
 
-        self.setMinimumSize(180, 110)
-        self.setMaximumWidth(300)
+        self.setFixedWidth(250)
+        self.setMinimumHeight(110)
 
         self.update_event()
         self.timer = QTimer(self)
