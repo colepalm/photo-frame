@@ -79,10 +79,20 @@ class ForecastView(QWidget):
         day_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(day_label)
 
-        # Weather icon - using SVG widget
+        # Weather icon
         icon_widget = QSvgWidget()
-        icon_widget.setFixedSize(64, 64)
-        layout.addWidget(icon_widget)
+        icon_widget.setFixedSize(80, 80)
+        icon_widget.setStyleSheet("background-color: transparent;")
+
+        # Create a container for the icon to ensure proper centering
+        icon_container = QWidget()
+        icon_container.setStyleSheet("background-color: transparent;")
+        icon_container.setFixedHeight(90)
+        icon_layout = QVBoxLayout(icon_container)
+        icon_layout.setContentsMargins(0, 5, 0, 5)
+        icon_layout.addWidget(icon_widget, 0, Qt.AlignHCenter | Qt.AlignVCenter)
+
+        layout.addWidget(icon_container, 0, Qt.AlignCenter)
 
         # High temperature
         high_temp_label = QLabel("--°")
@@ -131,14 +141,14 @@ class ForecastView(QWidget):
         if weather_id == 800:
             return """<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="32" cy="32" r="12" fill="#FFD700"/>
-                <line x1="32" y1="8" x2="32" y2="16" stroke="#FFD700" stroke-width="3"/>
-                <line x1="32" y1="48" x2="32" y2="56" stroke="#FFD700" stroke-width="3"/>
-                <line x1="8" y1="32" x2="16" y2="32" stroke="#FFD700" stroke-width="3"/>
-                <line x1="48" y1="32" x2="56" y2="32" stroke="#FFD700" stroke-width="3"/>
-                <line x1="14" y1="14" x2="20" y2="20" stroke="#FFD700" stroke-width="3"/>
-                <line x1="44" y1="44" x2="50" y2="50" stroke="#FFD700" stroke-width="3"/>
-                <line x1="50" y1="14" x2="44" y2="20" stroke="#FFD700" stroke-width="3"/>
-                <line x1="20" y1="44" x2="14" y2="50" stroke="#FFD700" stroke-width="3"/>
+                <line x1="32" y1="8" x2="32" y2="16" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+                <line x1="32" y1="48" x2="32" y2="56" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+                <line x1="8" y1="32" x2="16" y2="32" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+                <line x1="48" y1="32" x2="56" y2="32" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+                <line x1="14" y1="14" x2="20" y2="20" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+                <line x1="44" y1="44" x2="50" y2="50" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+                <line x1="50" y1="14" x2="44" y2="20" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+                <line x1="20" y1="44" x2="14" y2="50" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
             </svg>"""
         # Cloudy
         elif weather_id > 802:
@@ -151,8 +161,8 @@ class ForecastView(QWidget):
         elif weather_id == 801 or weather_id == 802:
             return """<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="24" cy="20" r="10" fill="#FFD700"/>
-                <line x1="24" y1="6" x2="24" y2="12" stroke="#FFD700" stroke-width="2"/>
-                <line x1="10" y1="20" x2="16" y2="20" stroke="#FFD700" stroke-width="2"/>
+                <line x1="24" y1="6" x2="24" y2="12" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
+                <line x1="10" y1="20" x2="16" y2="20" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
                 <ellipse cx="35" cy="40" rx="16" ry="11" fill="#BDC3C7"/>
                 <ellipse cx="22" cy="38" rx="12" ry="9" fill="#95A5A6"/>
             </svg>"""
@@ -160,9 +170,9 @@ class ForecastView(QWidget):
         elif 500 <= weather_id < 600:
             return """<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="32" cy="24" rx="18" ry="12" fill="#95A5A6"/>
-                <line x1="22" y1="38" x2="20" y2="48" stroke="#3498DB" stroke-width="3"/>
-                <line x1="32" y1="38" x2="30" y2="48" stroke="#3498DB" stroke-width="3"/>
-                <line x1="42" y1="38" x2="40" y2="48" stroke="#3498DB" stroke-width="3"/>
+                <line x1="22" y1="38" x2="20" y2="48" stroke="#3498DB" stroke-width="3" stroke-linecap="round"/>
+                <line x1="32" y1="38" x2="30" y2="48" stroke="#3498DB" stroke-width="3" stroke-linecap="round"/>
+                <line x1="42" y1="38" x2="40" y2="48" stroke="#3498DB" stroke-width="3" stroke-linecap="round"/>
             </svg>"""
         # Snow
         elif 600 <= weather_id < 700:
@@ -184,10 +194,10 @@ class ForecastView(QWidget):
         else:
             return """<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="32" cy="24" rx="18" ry="12" fill="#BDC3C7"/>
-                <line x1="20" y1="38" x2="20" y2="44" stroke="#5DADE2" stroke-width="2"/>
-                <line x1="28" y1="40" x2="28" y2="46" stroke="#5DADE2" stroke-width="2"/>
-                <line x1="36" y1="38" x2="36" y2="44" stroke="#5DADE2" stroke-width="2"/>
-                <line x1="44" y1="40" x2="44" y2="46" stroke="#5DADE2" stroke-width="2"/>
+                <line x1="20" y1="38" x2="20" y2="44" stroke="#5DADE2" stroke-width="2" stroke-linecap="round"/>
+                <line x1="28" y1="40" x2="28" y2="46" stroke="#5DADE2" stroke-width="2" stroke-linecap="round"/>
+                <line x1="36" y1="38" x2="36" y2="44" stroke="#5DADE2" stroke-width="2" stroke-linecap="round"/>
+                <line x1="44" y1="40" x2="44" y2="46" stroke="#5DADE2" stroke-width="2" stroke-linecap="round"/>
             </svg>"""
 
     def update_forecast(self):

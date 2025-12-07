@@ -77,7 +77,7 @@ class MainWindow(QMainWindow):
         )
 
         self.forecast_view = ForecastView(central_widget, api_key, city_name)
-        self.forecast_view.hide()
+        # self.forecast_view.hide()
 
         self.showing_forecast = False
 
