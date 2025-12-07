@@ -2,7 +2,8 @@ import requests
 
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame
 from PyQt5.QtCore import Qt, QTimer, QByteArray
-from PyQt5.QtSvg import QSvgWidget
+from PyQt5.QtSvg import QSvgRenderer
+from PyQt5.QtGui import QPixmap, QPainter
 from datetime import datetime
 
 
@@ -64,9 +65,9 @@ class ForecastView(QWidget):
         day_frame.setMaximumHeight(340)
 
         layout = QVBoxLayout(day_frame)
-        layout.setSpacing(12)
+        layout.setSpacing(15)
         layout.setAlignment(Qt.AlignCenter)
-        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setContentsMargins(20, 30, 20, 20)
 
         # Day name
         day_label = QLabel("Day")
@@ -77,22 +78,19 @@ class ForecastView(QWidget):
             background-color: transparent;
         """)
         day_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(day_label)
+        layout.addWidget(day_label, 0, Qt.AlignCenter)
 
-        # Weather icon
-        icon_widget = QSvgWidget()
-        icon_widget.setFixedSize(80, 80)
-        icon_widget.setStyleSheet("background-color: transparent;")
+        layout.addSpacing(10)
 
-        # Create a container for the icon to ensure proper centering
-        icon_container = QWidget()
-        icon_container.setStyleSheet("background-color: transparent;")
-        icon_container.setFixedHeight(90)
-        icon_layout = QVBoxLayout(icon_container)
-        icon_layout.setContentsMargins(0, 5, 0, 5)
-        icon_layout.addWidget(icon_widget, 0, Qt.AlignHCenter | Qt.AlignVCenter)
+        # Weather icon - using QLabel instead of QSvgWidget
+        icon_label = QLabel()
+        icon_label.setFixedSize(80, 80)
+        icon_label.setStyleSheet("background-color: transparent;")
+        icon_label.setAlignment(Qt.AlignCenter)
+        icon_label.setScaledContents(False)
+        layout.addWidget(icon_label, 0, Qt.AlignCenter)
 
-        layout.addWidget(icon_container, 0, Qt.AlignCenter)
+        layout.addSpacing(10)
 
         # High temperature
         high_temp_label = QLabel("--°")
@@ -102,8 +100,9 @@ class ForecastView(QWidget):
             font-weight: bold;
             background-color: transparent;
         """)
-        high_temp_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(high_temp_label)
+        high_temp_label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        high_temp_label.setFixedWidth(day_frame.maximumWidth())
+        layout.addWidget(high_temp_label, 0, Qt.AlignCenter)
 
         # Low temperature
         low_temp_label = QLabel("--°")
@@ -112,8 +111,9 @@ class ForecastView(QWidget):
             font-size: 24px;
             background-color: transparent;
         """)
-        low_temp_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(low_temp_label)
+        low_temp_label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        low_temp_label.setFixedWidth(day_frame.maximumWidth())
+        layout.addWidget(low_temp_label, 0, Qt.AlignCenter)
 
         # Weather description
         desc_label = QLabel("Loading...")
@@ -124,16 +124,28 @@ class ForecastView(QWidget):
         """)
         desc_label.setAlignment(Qt.AlignCenter)
         desc_label.setWordWrap(True)
-        layout.addWidget(desc_label)
+        layout.addWidget(desc_label, 0, Qt.AlignCenter)
 
         # Store references to labels
         day_frame.day_label = day_label
-        day_frame.icon_widget = icon_widget
+        day_frame.icon_label = icon_label
         day_frame.high_temp_label = high_temp_label
         day_frame.low_temp_label = low_temp_label
         day_frame.desc_label = desc_label
 
         return day_frame
+
+    def svg_to_pixmap(self, svg_data, size=80):
+        """Convert SVG data to QPixmap"""
+        renderer = QSvgRenderer(QByteArray(svg_data.encode()))
+        pixmap = QPixmap(size, size)
+        pixmap.fill(Qt.transparent)
+
+        painter = QPainter(pixmap)
+        renderer.render(painter)
+        painter.end()
+
+        return pixmap
 
     def get_weather_svg(self, weather_id):
         """Return SVG data for weather condition"""
@@ -251,7 +263,10 @@ class ForecastView(QWidget):
                     rep_weather = values['weather'][len(values['weather']) // 2]
                     weather_id = rep_weather['id']
                     svg_data = self.get_weather_svg(weather_id)
-                    day_widget.icon_widget.load(QByteArray(svg_data.encode()))
+
+                    # Convert SVG to pixmap and set it
+                    pixmap = self.svg_to_pixmap(svg_data, 80)
+                    day_widget.icon_label.setPixmap(pixmap)
 
                     description = rep_weather['description'].title()
                     day_widget.desc_label.setText(description)
