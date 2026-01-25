@@ -100,8 +100,7 @@ class ForecastView(QWidget):
             font-weight: bold;
             background-color: transparent;
         """)
-        high_temp_label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        high_temp_label.setFixedWidth(day_frame.maximumWidth())
+        high_temp_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(high_temp_label, 0, Qt.AlignCenter)
 
         # Low temperature
@@ -111,8 +110,7 @@ class ForecastView(QWidget):
             font-size: 24px;
             background-color: transparent;
         """)
-        low_temp_label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        low_temp_label.setFixedWidth(day_frame.maximumWidth())
+        low_temp_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(low_temp_label, 0, Qt.AlignCenter)
 
         # Weather description
