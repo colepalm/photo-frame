@@ -94,10 +94,10 @@ class CalendarWidget(QWidget):
         if timed_events:
             display_parts.append(self.format_event(timed_events[0], is_all_day=False))
 
-        # If we only have all-day events, show just the first one
-        if all_day_events and not timed_events:
-            display_parts = [self.format_event(all_day_events[0], is_all_day=True)]
+        if not display_parts:
+            self.event_label.setText("No upcoming events found.")
+        else:
+            self.event_label.setText("\n\n".join(display_parts))
 
-        self.event_label.setText("\n".join(display_parts))
         self.event_label.adjustSize()
         self.adjustSize()
