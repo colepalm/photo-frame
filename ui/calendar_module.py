@@ -27,7 +27,7 @@ class CalendarWidget(QWidget):
         self.layout.addWidget(self.event_label)
 
         self.setFixedWidth(250)
-        self.setMinimumHeight(110)
+        self.setFixedHeight(160)
 
         self.update_event()
         self.timer = QTimer(self)

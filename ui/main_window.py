@@ -157,7 +157,7 @@ class MainWindow(QMainWindow):
         self.calendar_widget.adjustSize()
         self.calendar_widget.move(
             20,
-            screen_size.height() - self.calendar_widget.height() - 20
+            screen_size.height() - self.calendar_widget.height() - 40
         )
 
         moon_sun_width = 200
