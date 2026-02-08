@@ -23,6 +23,9 @@ class CalendarWidget(QWidget):
         self.event_label.setAlignment(Qt.AlignCenter)
         self.event_label.setWordWrap(True)
 
+        # Add the label to the layout
+        self.layout.addWidget(self.event_label)
+
         self.setFixedWidth(250)
         self.setMinimumHeight(110)
 
@@ -30,19 +33,6 @@ class CalendarWidget(QWidget):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_event)
         self.timer.start(600000)  # Update every 10 minutes
-
-    def sizeHint(self):
-        """Provide a size hint based on content."""
-        return self.event_label.sizeHint()
-
-    def minimumSizeHint(self):
-        """Provide minimum size based on content."""
-        return self.event_label.minimumSizeHint()
-
-    def resizeEvent(self, event):
-        """Ensure the label fills the widget."""
-        self.event_label.setGeometry(0, 0, self.width(), self.height())
-        super().resizeEvent(event)
 
     def is_all_day_event(self, event):
         """Check if an event is an all-day event."""
@@ -73,7 +63,6 @@ class CalendarWidget(QWidget):
 
         if not events:
             self.event_label.setText("No upcoming events found.")
-            self.adjustSize()
             return
 
         all_day_events = []
@@ -98,6 +87,3 @@ class CalendarWidget(QWidget):
             self.event_label.setText("No upcoming events found.")
         else:
             self.event_label.setText("\n\n".join(display_parts))
-
-        self.event_label.adjustSize()
-        self.adjustSize()
