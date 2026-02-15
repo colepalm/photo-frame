@@ -80,5 +80,5 @@ DISPLAY_HEIGHT = 1080
 # Widget sizing
 # ---------------------------------------------------------------------------
 
-MOON_SUN_WIDTH  = 200
+MOON_SUN_WIDTH  = 220
 MOON_SUN_HEIGHT = 140

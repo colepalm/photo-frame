@@ -116,8 +116,9 @@ class _DayCard(QFrame):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setAttribute(Qt.WA_StyledBackground, True)
         self.setStyleSheet(
-            "QFrame { background-color: rgba(50, 50, 50, 120); border-radius: 10px; }"
+            "ForecastView { background-color: rgba(0, 0, 0, 180); border-radius: 15px; }"
         )
         self.setFixedWidth(200)
         self.setMinimumHeight(320)

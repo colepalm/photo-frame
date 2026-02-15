@@ -7,7 +7,12 @@ class TimeWidget(QLabel):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFont(QFont("Arial", 14))
-        self.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 100);")
+        self.setStyleSheet(
+            "color: white;"
+            "background-color: rgba(0, 0, 0, 100);"
+            "border-radius: 10px;"
+            "padding: 5px;"
+        )
         self.setAlignment(Qt.AlignCenter)
 
         self._tick()

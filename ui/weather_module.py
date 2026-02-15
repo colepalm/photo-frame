@@ -8,10 +8,10 @@ from utils import fetch_weather
 
 
 class WeatherWidget(QWidget):
-    _ICON_SIZE   = 45   # px — scaled weather icon
-    _ICON_WIDTH  = 60   # px — fixed width of the icon column
-    _FONT_MAX    = 14
-    _FONT_MIN    = 8
+    _ICON_SIZE  = 45
+    _ICON_WIDTH = 60
+    _FONT_MAX   = 14
+    _FONT_MIN   = 8
 
     def __init__(self, parent=None, api_key=None, city_name="Denver"):
         super().__init__(parent)
@@ -19,20 +19,24 @@ class WeatherWidget(QWidget):
         self.city_name = city_name
         self._weather_text = "Loading weather…"
 
-        # --- Icon column ---
+        self.setAttribute(Qt.WA_StyledBackground, True)
+        self.setStyleSheet(
+            "WeatherWidget {"
+            "  background-color: rgba(0, 0, 0, 100);"
+            "  border-radius: 10px;"
+            "}"
+            "QLabel { background-color: transparent; color: white; }"
+        )
+
         self.icon_label = QLabel(self)
-        self.icon_label.setStyleSheet("background-color: rgba(0, 0, 0, 100);")
         self.icon_label.setAlignment(Qt.AlignCenter)
         self.icon_label.setFixedWidth(self._ICON_WIDTH)
 
-        # --- Text column ---
         self.text_label = QLabel(self._weather_text, self)
         self.text_label.setFont(QFont("Arial", self._FONT_MAX))
-        self.text_label.setStyleSheet(
-            "color: white; background-color: rgba(0, 0, 0, 100); padding: 5px;"
-        )
         self.text_label.setAlignment(Qt.AlignCenter)
         self.text_label.setWordWrap(True)
+        self.text_label.setStyleSheet("padding: 5px;")
 
         layout = QHBoxLayout(self)
         layout.setContentsMargins(5, 5, 5, 5)
@@ -46,36 +50,25 @@ class WeatherWidget(QWidget):
 
         self.update_weather()
 
-    # ------------------------------------------------------------------
-    # Layout
-    # ------------------------------------------------------------------
-
     def resizeEvent(self, event):
         super().resizeEvent(event)
         self._fit_font(self._weather_text)
 
     def _fit_font(self, text: str):
-        """Scale the text label font down until the text fits, min _FONT_MIN pt."""
         available_w = self.width() - self._ICON_WIDTH - 30
         available_h = self.height() - 10
         if available_w <= 0 or available_h <= 0:
             return
-
         font = self.text_label.font()
         for size in range(self._FONT_MAX, self._FONT_MIN - 1, -1):
             font.setPointSize(size)
             rect = QFontMetrics(font).boundingRect(
                 0, 0, available_w, available_h,
-                Qt.AlignCenter | Qt.TextWordWrap,
-                text,
+                Qt.AlignCenter | Qt.TextWordWrap, text,
             )
             if rect.width() <= available_w and rect.height() <= available_h:
                 break
         self.text_label.setFont(font)
-
-    # ------------------------------------------------------------------
-    # Data refresh
-    # ------------------------------------------------------------------
 
     def update_weather(self):
         try:
@@ -105,13 +98,10 @@ class WeatherWidget(QWidget):
             raw = requests.get(url, timeout=5).content
             src = QPixmap()
             src.loadFromData(raw)
-
             scaled = src.scaled(
                 self._ICON_SIZE, self._ICON_SIZE,
                 Qt.KeepAspectRatio, Qt.SmoothTransformation,
             )
-
-            # Centre the scaled icon within the fixed-width column
             canvas = QPixmap(self.icon_label.size())
             canvas.fill(Qt.transparent)
             x = (canvas.width()  - scaled.width())  // 2
@@ -119,7 +109,6 @@ class WeatherWidget(QWidget):
             painter = QPainter(canvas)
             painter.drawPixmap(x, y, scaled)
             painter.end()
-
             self.icon_label.setPixmap(canvas)
         except Exception as exc:
             print(f"[weather] Icon error: {exc}")
