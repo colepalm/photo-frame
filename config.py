@@ -81,4 +81,4 @@ DISPLAY_HEIGHT = 1080
 # ---------------------------------------------------------------------------
 
 MOON_SUN_WIDTH  = 200
-MOON_SUN_HEIGHT = 200
+MOON_SUN_HEIGHT = 140

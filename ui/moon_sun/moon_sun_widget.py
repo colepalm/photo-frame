@@ -72,6 +72,7 @@ class MoonSunWidget(QWidget):
             ("daylight_label", "Daylight"),
         ):
             col = QVBoxLayout()
+            col.setSpacing(2)
             col.setContentsMargins(0, 0, 0, 0)
             hdr = self._label(8, dim=True)
             hdr.setText(header)
