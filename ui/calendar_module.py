@@ -1,11 +1,12 @@
 import datetime
 
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QLabel, QVBoxLayout, QWidget
 
-from utils import fetch_calendar_events
+import config
 from calendar_service import get_calendar_service
+from utils import fetch_calendar_events
 
 
 class CalendarWidget(QWidget):
@@ -13,18 +14,19 @@ class CalendarWidget(QWidget):
         super().__init__(parent)
         self.service = get_calendar_service()
 
-        self.layout = QVBoxLayout()
-        self.layout.setContentsMargins(5, 5, 5, 5)
-        self.setLayout(self.layout)
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(5, 5, 5, 5)
 
         self.event_label = QLabel(self)
-        self.event_label.setFont(QFont('Arial', 14))
-        self.event_label.setStyleSheet("color: white; background-color: rgba(0, 0, 0, 100); padding: 5px;")
+        self.event_label.setFont(QFont("Arial", 14))
+        self.event_label.setStyleSheet(
+            "color: white;"
+            "background-color: rgba(0, 0, 0, 100);"
+            "padding: 5px;"
+        )
         self.event_label.setAlignment(Qt.AlignCenter)
         self.event_label.setWordWrap(True)
-
-        # Add the label to the layout
-        self.layout.addWidget(self.event_label)
+        layout.addWidget(self.event_label)
 
         self.setFixedWidth(250)
         self.setFixedHeight(160)
@@ -32,58 +34,49 @@ class CalendarWidget(QWidget):
         self.update_event()
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_event)
-        self.timer.start(600000)  # Update every 10 minutes
+        self.timer.start(config.CALENDAR_REFRESH_MS)
 
-    def is_all_day_event(self, event):
-        """Check if an event is an all-day event."""
-        return 'date' in event['start'] and 'dateTime' not in event['start']
+    # ------------------------------------------------------------------
+    # Event formatting
+    # ------------------------------------------------------------------
 
-    def format_event(self, event, is_all_day=False):
-        """Format a single event for display."""
-        summary = event.get('summary', 'No Title')
+    @staticmethod
+    def _is_all_day(event: dict) -> bool:
+        return "date" in event["start"] and "dateTime" not in event["start"]
 
-        if is_all_day:
-            # For all-day events, just show the date and title
-            start = event['start'].get('date')
-            start_dt = datetime.datetime.fromisoformat(start)
-            formatted_start = start_dt.strftime('%m/%d')
-            event_text = f"{formatted_start}: {summary}"
-        else:
-            start = event['start'].get('dateTime', event['start'].get('date'))
-            start_dt = datetime.datetime.fromisoformat(start.replace('Z', '+00:00'))
-            formatted_date = start_dt.strftime('%m/%d')
-            formatted_time = start_dt.strftime('%I:%M%p')
-            event_text = f"{formatted_date} {formatted_time}\n{summary}"
+    @staticmethod
+    def _format_all_day(event: dict) -> str:
+        date_str = event["start"]["date"]
+        dt = datetime.date.fromisoformat(date_str)
+        return f"{dt.strftime('%m/%d')}: {event.get('summary', 'No Title')}"
 
-        return event_text
+    @staticmethod
+    def _format_timed(event: dict) -> str:
+        raw = event["start"].get("dateTime", event["start"].get("date", ""))
+        dt = datetime.datetime.fromisoformat(raw.replace("Z", "+00:00"))
+        return (
+            f"{dt.strftime('%m/%d')} {dt.strftime('%-I:%M %p')}\n"
+            f"{event.get('summary', 'No Title')}"
+        )
+
+    # ------------------------------------------------------------------
+    # Data refresh
+    # ------------------------------------------------------------------
 
     def update_event(self):
-        # Fetch more events to find both all-day and timed events
         events = fetch_calendar_events(self.service, max_results=5)
 
         if not events:
-            self.event_label.setText("No upcoming events found.")
+            self.event_label.setText("No upcoming events.")
             return
 
-        all_day_events = []
-        timed_events = []
+        all_day = [e for e in events if self._is_all_day(e)]
+        timed   = [e for e in events if not self._is_all_day(e)]
 
-        # Separate all-day and timed events
-        for event in events:
-            if self.is_all_day_event(event):
-                all_day_events.append(event)
-            else:
-                timed_events.append(event)
+        parts = []
+        if all_day:
+            parts.append(self._format_all_day(all_day[0]))
+        if timed:
+            parts.append(self._format_timed(timed[0]))
 
-        display_parts = []
-
-        if all_day_events:
-            display_parts.append(self.format_event(all_day_events[0], is_all_day=True))
-
-        if timed_events:
-            display_parts.append(self.format_event(timed_events[0], is_all_day=False))
-
-        if not display_parts:
-            self.event_label.setText("No upcoming events found.")
-        else:
-            self.event_label.setText("\n\n".join(display_parts))
+        self.event_label.setText("\n\n".join(parts) if parts else "No upcoming events.")
